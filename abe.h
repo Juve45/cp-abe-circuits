@@ -2,7 +2,7 @@
 #define __CP_ABE_H__
 
 
-#include "PBC.h"
+#include "pbc/PBC.h"
 #include <vector>
 #include <map>
 

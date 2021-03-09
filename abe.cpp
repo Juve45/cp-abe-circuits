@@ -4,6 +4,21 @@
 namespace CP_ABE {
 
 
+  // GT int_to_GT(int value) {
+
+  // }
+
+  // int GT_to_int(GT value) {
+  //   mpz_t extra, msg;
+
+  //   mpz_init(extra);
+  //   mpz_init(msg_gt);
+    
+  //   element_to_mpz(msg_gt, message_GT);
+  //   mpz_sub(ciphertext->extra, message , msg_gt);
+  // }
+
+
   std::pair<PublicKey, MasterKey> Controller::setup(const Pairing &pairing) {
 
     PublicKey public_key = PublicKey();
@@ -89,7 +104,7 @@ namespace CP_ABE {
     mpz_t z;
     mpz_init(z);
     mpz_set_si(z,123);
-    element_set_mpz(element, z);
+    element_random(element);
 
     m_t.setElement(element);
 
