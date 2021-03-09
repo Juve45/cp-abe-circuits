@@ -8,11 +8,14 @@ public:
 	vector <int> gates, f;
 	vector <CP_ABE::Attribute> attributes;
 	vector <vector<Zr>> shares;
-	Pairing *pairing;
 
+	BooleanCircuit(int node_count) {
+		this->node_count = node_count;
+		shares = vector <vector <Zr>> (node_count, vector <Zr>() );
+	}
 
-		void dfs(int node, Zr secret);
-		std::pair<bool, GT> dfs2(int node, const map <CP_ABE::Attribute, vector <GT> >& v);
-		// map <Attribute, vector <Zr>> share(Zr secret);
-		// std::pair<bool, GT> recon(map <Attribute, vector <GT>>);
+	map <CP_ABE::Attribute, vector <Zr>> share(Zr secret);
+	void dfs(int node, Zr secret);
+	std::pair<bool, GT> dfs2(int node, const map <CP_ABE::Attribute, vector <GT> >& v);
+	std::pair<bool, GT> recon(map <CP_ABE::Attribute, vector <GT>>);
 };

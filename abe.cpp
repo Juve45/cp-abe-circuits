@@ -30,28 +30,28 @@ namespace CP_ABE {
   }
 
   
-  DecryptionKey* Controller::keygen(const PublicKey public_key, 
+  DecryptionKey Controller::keygen(const PublicKey public_key, 
                                     const MasterKey master_key, 
                                     std::vector <Attribute> attributes) {
       
-    DecryptionKey *decryption_key = new DecryptionKey();
+    DecryptionKey decryption_key;
     map<Attribute, Zr> r_j;
     Zr r = Zr(*public_key.pairing, true);
-    decryption_key->r =r;
+    decryption_key.r =r;
 
     for(auto a : attributes) {
       r_j[a] = Zr(*public_key.pairing, true);
     }
     
 
-    decryption_key->d = master_key.g_alpha ^ master_key.beta.inverse();
+    decryption_key.d = master_key.g_alpha ^ master_key.beta.inverse();
     G1 gg = (public_key.g ^ (r * master_key.beta.inverse()));
-    decryption_key->d *= gg;
+    decryption_key.d *= gg;
 
     for(auto a : attributes) {
-      decryption_key->d_j[a] = (public_key.g ^ r) * (public_key.g ^ r_j[a]);
+      decryption_key.d_j[a] = (public_key.g ^ r) * (public_key.g ^ r_j[a]);
       //CP_ABE::get_attr_hash(*public_key.pairing, attribute)
-      decryption_key->d_j_p[a] = public_key.g ^ r_j[a];
+      decryption_key.d_j_p[a] = public_key.g ^ r_j[a];
     }
 
     return decryption_key;
@@ -60,16 +60,17 @@ namespace CP_ABE {
 
 
   Ciphertext Controller::encrypt(int message, const PublicKey& public_key, 
-                                 BaseAccessStructure& access_structure) {
+                                 BaseAccessStructure* access_structure) {
 
     Ciphertext ciphertext;
-    access_structure.pairing = public_key.pairing;
+    access_structure->pairing = public_key.pairing;
+    cout << "Pairing: " << access_structure->pairing << endl;
     ciphertext.access_structure = access_structure;
     Zr s = Zr(*public_key.pairing, true);
     
     ciphertext.s = s; // delete this
-
-    map <Attribute, vector <Zr> >  attr_shares = access_structure.share(s);
+    cout << "Here" << endl;
+    map <Attribute, vector <Zr> >  attr_shares = access_structure->share(s);
 
 
     for(auto & [attribute, shares] : attr_shares)
@@ -122,7 +123,7 @@ namespace CP_ABE {
     }
     cout << "OK" << endl;
 
-    auto res = ciphertext.access_structure.recon(v);
+    auto res = ciphertext.access_structure->recon(v);
     cout << "OK" << endl;
     if(res.first == false) 
       return -1; // access structure not satisfied

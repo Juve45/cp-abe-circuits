@@ -34,17 +34,21 @@ int main(int argc, char * argv[]) {
 	cout << "All good!" << endl;
 
 	auto dkey = cp_abe.keygen(pk, msk, a);
-	dkey->d.dump(stdout, "Key is ");
+	dkey.d.dump(stdout, "Key is ");
 
 
-	BooleanCircuit bc;
-	bc.node_count = 5;
+	BooleanCircuit bc(5);
+	// bc.node_count = 5;
 	bc.in_edges = {{1, 4}, {2, 3}, {}, {}, {}};
 	bc.out_edges = {{}, {0}, {1}, {1}, {0}};
 	bc.gates = {0, 1, 0, 0, 0};
+
 	bc.attributes = {CP_ABE::Attribute(-1), CP_ABE::Attribute(-1), a[0], a[1], a[2]};
 
-	CP_ABE::Ciphertext ct = cp_abe.encrypt(11424, pk, bc);
-	cout << cp_abe.decrypt(ct, *dkey, pk);
+	cout << "BC defined" << endl;
+
+	CP_ABE::Ciphertext ct = cp_abe.encrypt(11424, pk, &bc);
+	cout << "Encrypted! " << endl;
+	cout << cp_abe.decrypt(ct, dkey, pk);
 
 }

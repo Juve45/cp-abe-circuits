@@ -20,12 +20,13 @@ namespace CP_ABE {
 
 	class BaseAccessStructure {
 	public:
-		virtual map <Attribute, vector <Zr>> share(Zr secret);
-  		virtual std::pair<bool, GT> recon(map <Attribute, vector <GT>> v);
+		Pairing *pairing;
+		virtual map <Attribute, vector <Zr>> share(Zr secret) = 0;
+  		virtual std::pair<bool, GT> recon(map <Attribute, vector <GT>> v) = 0;
 	};
 
 	struct Ciphertext {
-		BaseAccessStructure access_structure; 
+		BaseAccessStructure *access_structure; 
 		GT c_m;
 		G1 c;
 		Zr s;
@@ -55,9 +56,9 @@ namespace CP_ABE {
 	public:
 		std::pair<PublicKey, MasterKey> setup(const Pairing &pairing);
 
-		Ciphertext encrypt(int message, const PublicKey& publicKey, BooleanCircuit& boolean_circuit);
+		Ciphertext encrypt(int message, const PublicKey& publicKey, BaseAccessStructure* boolean_circuit);
 
-		DecryptionKey* keygen(const PublicKey public_key, const MasterKey master_key, std::vector <Attribute> attributes);
+		DecryptionKey keygen(const PublicKey public_key, const MasterKey master_key, std::vector <Attribute> attributes);
 		
 		int decrypt(const Ciphertext& ciphertext, const DecryptionKey& decryption_key, const PublicKey& public_key);
 		
