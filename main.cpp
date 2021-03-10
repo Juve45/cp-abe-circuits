@@ -47,8 +47,13 @@ int main(int argc, char * argv[]) {
 
 	cout << "BC defined" << endl;
 
-	CP_ABE::Ciphertext ct = cp_abe.encrypt(11424, pk, &bc);
+	mpz_t message;
+	mpz_init(message);
+	mpz_set_si(message, 123);
+
+	CP_ABE::Ciphertext ct = cp_abe.encrypt(message, pk, &bc);
 	cout << "Encrypted! " << endl;
-	cout << cp_abe.decrypt(ct, dkey, pk);
+	cp_abe.decrypt(ct, dkey, pk);
+
 
 }

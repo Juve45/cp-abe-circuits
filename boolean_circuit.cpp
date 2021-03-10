@@ -7,14 +7,11 @@
 void BooleanCircuit::dfs(int node, Zr secret) {
 
 
-  cout << node << ' ' << in_edges[node].size(); cout.flush();
-
   if(in_edges[node].size() == 0)  {
     shares[node].push_back(secret); 
     return;
   }
   shares[node] = { secret };
-  cout << " T ";cout.flush();
 
   if(gates[node] == 0) { // OR gate
 
@@ -23,16 +20,13 @@ void BooleanCircuit::dfs(int node, Zr secret) {
       dfs(i, secret);
     }
   } else { // AND gate
-    cout << "At the AND" << pairing << endl;
     Zr sum = Zr(*pairing, (long int) 0);
 
-    cout << "At the begining" << endl;
     for(int i = 1; i < in_edges[node].size(); i++) {
       Zr x = Zr(*pairing, true);
       sum += x;
       dfs(in_edges[node][i], x);
     }
-    cout << "At the end" << endl;
 
     dfs(in_edges[node][0], secret - sum);
   }

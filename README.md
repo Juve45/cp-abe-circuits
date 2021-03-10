@@ -10,6 +10,12 @@ The SSBM requires PBC and GMP as requirements.
 Also, we use the C++ PBCWrapper.
 
 
+## Compilation
+
+Our algorithm can be compiled with the command:
+```
+g++ -static -std=c++17 main.cpp abe.cpp boolean_circuit.cpp libPBC.a -lpbc -lgmp -fpermissive -w
+```
 
 
 ## CP_ABE Namespace

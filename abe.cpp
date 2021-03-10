@@ -1,6 +1,5 @@
 #include "abe.h"
 
-
 namespace CP_ABE {
 
 
@@ -17,6 +16,19 @@ namespace CP_ABE {
   //   element_to_mpz(msg_gt, message_GT);
   //   mpz_sub(ciphertext->extra, message , msg_gt);
   // }
+
+  G1 Attribute::hash(Pairing * pairing) {
+    string str = this->get_str_value();
+    return G1 (*pairing, str.c_str(), str.size());
+  }
+
+  void get_mpz(mpz_t big_integer, GT gt) {
+    // mpz_t big_integer;
+    mpz_init(big_integer);
+    mpz_set_si(big_integer, 100);
+    element_to_mpz(big_integer, gt.getElement());
+    return big_integer;
+  }
 
 
   std::pair<PublicKey, MasterKey> Controller::setup(const Pairing &pairing) {
@@ -64,7 +76,7 @@ namespace CP_ABE {
     decryption_key.d *= gg;
 
     for(auto a : attributes) {
-      decryption_key.d_j[a] = (public_key.g ^ r) * (public_key.g ^ r_j[a]);
+      decryption_key.d_j[a] = (public_key.g ^ r) * (a.hash(public_key.pairing) ^ r_j[a]);
       //CP_ABE::get_attr_hash(*public_key.pairing, attribute)
       decryption_key.d_j_p[a] = public_key.g ^ r_j[a];
     }
@@ -74,53 +86,45 @@ namespace CP_ABE {
   }
 
 
-  Ciphertext Controller::encrypt(int message, const PublicKey& public_key, 
+  Ciphertext Controller::encrypt(mpz_t message, const PublicKey& public_key, 
                                  BaseAccessStructure* access_structure) {
 
     Ciphertext ciphertext;
     access_structure->pairing = public_key.pairing;
-    cout << "Pairing: " << access_structure->pairing << endl;
+    
     ciphertext.access_structure = access_structure;
     Zr s = Zr(*public_key.pairing, true);
     
     ciphertext.s = s; // delete this
-    cout << "Here" << endl;
+    
     map <Attribute, vector <Zr> >  attr_shares = access_structure->share(s);
 
 
     for(auto & [attribute, shares] : attr_shares)
       for(const auto &i : shares) {
         ciphertext.c_x[attribute].push_back(public_key.g ^ i);
-        ciphertext.c_x_prim[attribute].push_back(public_key.g ^ i);  
+        ciphertext.c_x_prim[attribute].push_back(attribute.hash(public_key.pairing) ^ i);  
         //CP_ABE::get_attr_hash(*public_key.pairing, attribute)
       }
     ciphertext.c    = public_key.h ^ s;
     ciphertext.c_m  = public_key.egg_alpha ^ s;
     GT m_t          = GT(*public_key.pairing, false);
-    m_t.dump(stdout, "message (rand) in GT:");
-    element_t element;
-    element_init_same_as(element, m_t.getElement());
+    // m_t.dump(stdout, "message in GT: ");
+    get_mpz(ciphertext.extra , m_t);
+    
+    mpz_out_str(stdout, 10, ciphertext.extra);
+    cout << endl;
+    mpz_sub(ciphertext.extra, ciphertext.extra, message);
+    
+    mpz_out_str(stdout, 10, ciphertext.extra);
+    cout << endl;
 
-    mpz_t z;
-    mpz_init(z);
-    mpz_set_si(z,123);
-    element_random(element);
-
-    m_t.setElement(element);
-
-
-    element_to_mpz(z, element);
-    gmp_printf ("%s is an mpz %Zd\n", "here", z);
-    element_to_mpz(z, m_t.getElement());
-    gmp_printf ("%s is an mpz %Zd\n", "here", z);
-
-    m_t.dump(stdout, "message (norm) in GT:");
     ciphertext.c_m *= m_t;
 
     return ciphertext;
   }
 
-  int Controller::decrypt(const Ciphertext& ciphertext, 
+  void Controller::decrypt(const Ciphertext& ciphertext, 
                           const DecryptionKey& decryption_key,
                           const PublicKey& public_key) {
     map <Attribute, vector<GT>> v;
@@ -143,22 +147,30 @@ namespace CP_ABE {
     if(res.first == false) 
       return -1; // access structure not satisfied
     GT egg_rs = res.second;
-    GT gre = (*public_key.pairing)(public_key.g, public_key.g) ^ (ciphertext.s * decryption_key.r);
 
-    gre.dump(stdout, "gre:");
     egg_rs.dump(stdout, "e(g,g)^rs");
 
     GT m = ciphertext.c_m * egg_rs / (*public_key.pairing)(ciphertext.c, decryption_key.d);
 
-    ((*public_key.pairing)(ciphertext.c, decryption_key.d)).dump(stdout, "e(g, g)^(alpha+r)s - ");
-    ((*public_key.pairing)(public_key.g, public_key.g)^(ciphertext.s * (decryption_key.r + public_key.alpha))).dump(stdout, "e(g, g)^(alpha+r)s - ");
+    // ciphertext.extra = get_mpz(m_t);
 
 
 
-    m.dump(stdout, "Recovered message in GT is: ");
+    mpz_t message;
+    mpz_init(message);
+    get_mpz(message, m);
+
+
+    mpz_sub(message, message, ciphertext.extra);
+
+    cout << "recovered message is: "; 
+    mpz_out_str(stdout, 10, message);
+    cout << endl;
+
+
+    // m.dump(stdout, "Recovered message in GT is: ");
     // element_printf("%Z\n", ms);
 
-    return 0;
     // mpz_t z;
   }
 

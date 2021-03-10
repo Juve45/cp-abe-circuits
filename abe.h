@@ -8,15 +8,26 @@
 
 namespace CP_ABE {
 
+
 	class Attribute {
 
-		string attribute;
 	public:
+		string name;
 		int value;
-		Attribute(int value) {this->value=value;}
+		bool isNumeric;
+		Attribute(int value) {this->value=value; isNumeric = true;}
+		Attribute(string name) {this->name=name; isNumeric = false;}
 
 		bool operator<(const Attribute& rhs) const { return value < rhs.value; };
+		string get_str_value() {
+			if(isNumeric)
+				return to_string(value);
+			return name;
+		}
+
+		G1 hash(Pairing * pairing);
 	};
+
 
 	class BaseAccessStructure {
 	public:
@@ -30,6 +41,7 @@ namespace CP_ABE {
 		GT c_m;
 		G1 c;
 		Zr s;
+		mpz_t extra;
 		map <Attribute, vector <G1>> c_x, c_x_prim;
 	};
 
@@ -56,11 +68,11 @@ namespace CP_ABE {
 	public:
 		std::pair<PublicKey, MasterKey> setup(const Pairing &pairing);
 
-		Ciphertext encrypt(int message, const PublicKey& publicKey, BaseAccessStructure* boolean_circuit);
+		Ciphertext encrypt(mpz_t message, const PublicKey& publicKey, BaseAccessStructure* boolean_circuit);
 
 		DecryptionKey keygen(const PublicKey public_key, const MasterKey master_key, std::vector <Attribute> attributes);
 		
-		int decrypt(const Ciphertext& ciphertext, const DecryptionKey& decryption_key, const PublicKey& public_key);
+		void decrypt(const Ciphertext& ciphertext, const DecryptionKey& decryption_key, const PublicKey& public_key);
 		
 	private:
 
