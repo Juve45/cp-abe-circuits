@@ -15,10 +15,9 @@ void BooleanCircuit::dfs(int node, Zr secret) {
 
   if(gates[node] == 0) { // OR gate
 
-    for(auto i : in_edges[node]) {
-      (cout << i).flush();
+    for(auto i : in_edges[node]) 
       dfs(i, secret);
-    }
+
   } else { // AND gate
     Zr sum = Zr(*pairing, (long int) 0);
 
@@ -31,8 +30,6 @@ void BooleanCircuit::dfs(int node, Zr secret) {
     dfs(in_edges[node][0], secret - sum);
   }
 }
-
-
 
 
 map <CP_ABE::Attribute,  vector <Zr>> BooleanCircuit::share(Zr secret) {
@@ -51,13 +48,11 @@ map <CP_ABE::Attribute,  vector <Zr>> BooleanCircuit::share(Zr secret) {
   return attr_shares;
 }
 
+
 std::pair<bool, GT> BooleanCircuit::dfs2(int node, 
   const map <CP_ABE::Attribute, vector <GT>> &v) {
-  
-  cout << "node " << node << endl;
 
   if(in_edges[node].size() == 0) {
-    cout << v.count(attributes[node]) << f[node] << endl;
     if(v.count(attributes[node]) > 0) 
       return {true, v[attributes[node]][ f[node]++ ]};
     else return {false, GT(*pairing, true)};
@@ -80,8 +75,8 @@ std::pair<bool, GT> BooleanCircuit::dfs2(int node,
       return {true, ret};
   }
   return {false, GT()};
-
 }
+
 
 std::pair<bool, GT> BooleanCircuit::recon(map <CP_ABE::Attribute, vector <GT>> v) {
   f = vector <int> (node_count, 0);

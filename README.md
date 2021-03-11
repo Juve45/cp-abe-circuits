@@ -2,13 +2,14 @@
 Attribute Based Encryption for Boolean Circuits.
 
 We provide implementation for an Ciphertext-policy Attribute-Based Encryption with Boolean circuits access structure
-The implementation is written fully in C++, on top of the PBC Library.
+The implementation is written fully in C++, on top of the [PBC Library]{https://crypto.stanford.edu/pbc/}. 
+It also uses the [C++ PBC Wrapper]{https://crysp.uwaterloo.ca/software/PBCWrapper/}.
 
 ## Installation
 
 The SSBM requires PBC and GMP as requirements.
 Also, we use the C++ PBCWrapper.
-
+we included in our repository a pre-compiled version of the C++ PBC Wrapper (`libpbc.a`) along with the headers required (in `pbc/`)
 
 ## Compilation
 

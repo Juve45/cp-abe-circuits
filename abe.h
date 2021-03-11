@@ -40,7 +40,6 @@ namespace CP_ABE {
 		BaseAccessStructure *access_structure; 
 		GT c_m;
 		G1 c;
-		Zr s;
 		mpz_t extra;
 		map <Attribute, vector <G1>> c_x, c_x_prim;
 	};
@@ -55,7 +54,6 @@ namespace CP_ABE {
 		G1 g;
 		G1 h;
 		GT egg_alpha;
-		Zr alpha;
 	};
 
 	struct DecryptionKey {
@@ -68,11 +66,11 @@ namespace CP_ABE {
 	public:
 		std::pair<PublicKey, MasterKey> setup(const Pairing &pairing);
 
-		Ciphertext encrypt(mpz_t message, const PublicKey& publicKey, BaseAccessStructure* boolean_circuit);
+		Ciphertext encrypt(int message, const PublicKey& publicKey, BaseAccessStructure* boolean_circuit);
 
 		DecryptionKey keygen(const PublicKey public_key, const MasterKey master_key, std::vector <Attribute> attributes);
 		
-		void decrypt(const Ciphertext& ciphertext, const DecryptionKey& decryption_key, const PublicKey& public_key);
+		int decrypt(const Ciphertext& ciphertext, const DecryptionKey& decryption_key, const PublicKey& public_key);
 		
 	private:
 
