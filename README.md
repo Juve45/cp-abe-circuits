@@ -2,8 +2,8 @@
 Attribute Based Encryption for Boolean Circuits.
 
 We provide implementation for an Ciphertext-policy Attribute-Based Encryption with Boolean circuits access structure
-The implementation is written fully in C++, on top of the [PBC Library]{https://crypto.stanford.edu/pbc/}. 
-It also uses the [C++ PBC Wrapper]{https://crysp.uwaterloo.ca/software/PBCWrapper/}.
+The implementation is written fully in C++, on top of the [PBC Library](https://crypto.stanford.edu/pbc/). 
+It also uses the [C++ PBC Wrapper](https://crysp.uwaterloo.ca/software/PBCWrapper/).
 
 ## Installation
 
@@ -99,7 +99,18 @@ int recovered_message = cp_abe.decrypt(ct, dkey, pk);
 We provide an interface for access structures: `BaseAccessStructure`. In order to implement a valid access structure, only 2 algorithms are required: `share` and `recon`, which must
 share and reconstruct the secret value from the access structure.
 
-We provide an example of such implementation of a BooleanCircuit (`BooleanCircuit` in `boolean_circuit.h`).
+We provide an example of such implementation of a BooleanCircuit (`BooleanCircuit` in `boolean_circuit.h` and `boolean_circuit.cpp`).
+
+
+Usage of our example `BooleanCuircut` class:
+
+```
+// Boolean circuit with 5 nodes
+BooleanCircuit bc(5);
+bc.in_edges = {{1, 4}, {2, 3}, {}, {}, {}};
+bc.out_edges = {{}, {0}, {1}, {1}, {0}};
+bc.gates = {0, 1, 0, 0, 0};
+```
 
 
 
